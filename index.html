@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Joguinho Romântico 💖</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap');
+
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background: linear-gradient(to right, #ffd6e8, #ffeaf4);
+      color: #444;
+      text-align: center;
+      padding: 40px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      max-width: 650px;
+      margin: auto;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      position: relative;
+      z-index: 2;
+    }
+
+    h1, h2 {
+      color: #e90958;
+      margin-bottom: 15px;
+    }
+
+    p {
+      font-size: 18px;
+    }
+
+    #options button {
+      display: block;
+      margin: 12px auto;
+      padding: 12px 24px;
+      border: none;
+      background-color: #e60b63;
+      color: white;
+      font-size: 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    #options button:hover {
+      background-color: #d32065;
+    }
+
+    #next-button,
+    .start-button {
+      margin-top: 20px;
+      padding: 12px 24px;
+      background-color: #a95aa1;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    #next-button:hover,
+    .start-button:hover {
+      background-color: #7e3c7a;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .dedication {
+      margin-top: 20px;
+      font-size: 20px;
+      color: #c9184a;
+      animation: fadeIn 2s ease-in-out forwards;
+      line-height: 1.5;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Corações animados */
+    .heart {
+  position: absolute;
+  width: 25px;
+  height: 25px;
+  background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Heart_symbol_red.svg/1024px-Heart_symbol_red.svg.png') no-repeat center center/contain;
+  animation: floatHearts 8s infinite ease-in-out;
+  opacity: 0.5;
+  z-index: 0;
+  pointer-events: none;
+}
+    @keyframes floatHearts {
+      0% {
+        transform: translateY(0) scale(1);
+        opacity: 0.4;
+      }
+      50% {
+        transform: translateY(-150px) scale(1.2);
+        opacity: 0.7;
+      }
+      100% {
+        transform: translateY(-300px) scale(1);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Introdução -->
+    <div id="intro">
+      <h1>Vamos fazer um jogo mor? 🎲💘</h1>
+      <p>Se você acertar tudo, tem uma surpresinha no final! 💝</p>
+      <button onclick="startGame()" class="start-button">Começar</button>
+    </div>
+
+    <!-- Quiz -->
+    <div id="quiz-container" class="hidden">
+      <div id="question">Carregando pergunta...</div>
+      <div id="options"></div>
+      <button id="next-button" onclick="nextQuestion()">Próxima</button>
+    </div>
+
+    <!-- Resultado -->
+    <div id="result" class="hidden">
+      <h2>Parabéns, meu amor! 💕</h2>
+      <p>Você acertou todas! Isso mostra o quanto somos conectados! 😍</p>
+      <p class="dedication">
+        Você é a melhor parte da minha vida. <br />
+        Obrigado por me fazer sorrir todos os dias, por ser minha companheira, meu amor, minha <strong>princesa</strong>. <br />
+        Eu te amo com todo meu coração! 💖
+      </p>
+    </div>
+  </div>
+
+  <!-- JavaScript do jogo -->
+  <script>
+    const questions = [
+      {
+        question: "Aonde nós nos conhecemos?",
+        options: ["Na escola", "Na igreja", "No shopping", "Na praia"],
+        answer: "Na igreja"
+      },
+      {
+        question: "Aonde foi nosso primeiro encontro?",
+        options: ["No cinema", "No vila", "Na praça", "Fornaci"],
+        answer: "Fornaci"
+      },
+      {
+        question: "O que eu comentei no seu primeiro story que respondi?",
+        options: ["Linda", "Perfeita", "Gata", "Charmosa"],
+        answer: "Perfeita"
+      },
+      {
+        question: "Como eu amo te chamar?",
+        options: ["Amor", "Vida", "Mozão", "Princesa"],
+        answer: "Princesa"
+      }
+    ];
+
+    let currentQuestion = 0;
+    let correctAnswers = 0;
+
+    const introEl = document.getElementById('intro');
+    const questionEl = document.getElementById('question');
+    const optionsEl = document.getElementById('options');
+    const nextButton = document.getElementById('next-button');
+    const quizContainer = document.getElementById('quiz-container');
+    const resultEl = document.getElementById('result');
+
+    function startGame() {
+      introEl.classList.add('hidden');
+      quizContainer.classList.remove('hidden');
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      const q = questions[currentQuestion];
+      questionEl.textContent = q.question;
+      optionsEl.innerHTML = '';
+      q.options.forEach(option => {
+        const btn = document.createElement('button');
+        btn.textContent = option;
+        btn.onclick = () => selectAnswer(option);
+        optionsEl.appendChild(btn);
+      });
+      nextButton.style.display = 'none';
+    }
+
+    function selectAnswer(selected) {
+      const correct = questions[currentQuestion].answer;
+      if (selected === correct) {
+        correctAnswers++;
+      }
+      Array.from(optionsEl.children).forEach(btn => {
+        btn.disabled = true;
+        if (btn.textContent === correct) {
+          btn.style.backgroundColor = '#57cc99';
+        } else if (btn.textContent === selected) {
+          btn.style.backgroundColor = '#ff6b6b';
+        }
+      });
+      nextButton.style.display = 'inline-block';
+    }
+
+    function nextQuestion() {
+      currentQuestion++;
+      if (currentQuestion < questions.length) {
+        loadQuestion();
+      } else {
+        showResult();
+      }
+    }
+
+    function showResult() {
+      quizContainer.style.display = 'none';
+      resultEl.classList.remove('hidden');
+    }
+
+    // Corações animados no fundo
+    function createHearts() {
+      for (let i = 0; i < 15; i++) {
+        const heart = document.createElement("div");
+        heart.classList.add("heart");
+        heart.style.left = Math.random() * 100 + "vw";
+        heart.style.animationDuration = (Math.random() * 5 + 4) + "s";
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 8000);
+      }
+    }
+    setInterval(createHearts, 2000);
+  </script>
+</body>
+</html>
